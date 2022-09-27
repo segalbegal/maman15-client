@@ -13,10 +13,30 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\constants">
+      <UniqueIdentifier>{4a25d5b0-cb3e-45f6-9f9f-a53074199cf6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="msg_code.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="status.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="size.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
