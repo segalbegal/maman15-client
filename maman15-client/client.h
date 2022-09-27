@@ -1,20 +1,21 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <boost/asio.hpp>
+#include <WinSock2.h>
 #include "status.h"
+#include "size.h"
 
 using std::string;
 using std::vector;
-using boost::asio::ip::tcp;
-using boost::shared_ptr;
 
 class Client
 {
 private:
 	string mIp;
 	int mPort;
-	tcp::socket* mSock;
+
+	SOCKET connectToServer();
+	void disconnectFromServer(SOCKET sock);
 
 	void copyNumberToVector(vector<BYTE>& source, int num, int len, int offset = 0);
 	void copyArrayToVector(vector<BYTE>& source, BYTE* arr, int len, int offset = 0);
@@ -25,6 +26,7 @@ public:
 	Client(string ip, int port);
 	~Client() = default;
 
-	bool registerClient(string name);
+	bool registerClient(string name, char id[ID_LEN]);
+	bool sendPublicKey();
 };
 

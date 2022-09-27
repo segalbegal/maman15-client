@@ -31,7 +31,8 @@ int main()
 	struct TransferDetails details = readTransferDetails();
 	Client c(details.connectionDetails.ip, details.connectionDetails.port);
 
-	bool res = c.registerClient(details.clientName);
+	char id[ID_LEN] = {0};
+	bool res = c.registerClient(details.clientName, id);
 	if (!res)
 	{
 		cout << "Server responded with an error" << endl;

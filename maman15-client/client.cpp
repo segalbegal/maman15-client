@@ -1,3 +1,6 @@
+#pragma comment(lib, "Ws2_32.lib")
+#pragma warning(disable:4996)
+
 #include "client.h"
 #include <vector>
 #include "size.h"
@@ -8,6 +11,27 @@
 #define ZERO '0'
 
 using std::to_string;
+
+SOCKET Client::connectToServer()
+{
+	struct sockaddr_in addr;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(mPort);
+	addr.sin_addr.s_addr = inet_addr(mIp.c_str());
+
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) == INVALID_SOCKET)
+	{
+		return -1;
+	}
+
+	return sock;
+}
+
+void Client::disconnectFromServer(SOCKET sock)
+{
+	closesocket(sock);
+}
 
 void Client::copyNumberToVector(vector<BYTE>& source, int num, int len, int offset)
 {
@@ -30,27 +54,24 @@ void Client::copyArrayToVector(vector<BYTE>& source, BYTE* arr, int len, int off
 
 bool Client::sendMessageToServer(const vector<BYTE>& data, Status success)
 {
-	char resBuf[STATUS_LEN];
+	char resBuf[STATUS_LEN] = {0};
+	SOCKET sock = connectToServer();
 
-	boost::asio::io_context context;
-	tcp::socket sock(context);
-	tcp::resolver resolver(context);
-
-	boost::asio::connect(sock, resolver.resolve(mIp, to_string(mPort)));
-	boost::asio::write(sock, boost::asio::buffer(data, MSGCODE_LEN + NAME_LEN));
-	boost::asio::read(sock, boost::asio::buffer(resBuf, STATUS_LEN));
+	send(sock, (char*)&data[0], data.size(), 0);
+	recv(sock, resBuf, STATUS_LEN, 0);
 	
-	sock.close();
-
+	disconnectFromServer(sock);
 	Status status = (Status)std::stoi(string(resBuf));
 	return status == success;
 }
 
 Client::Client(string ip, int port) : mIp(ip), mPort(port)
 {
+	WSAData wsaData;
+	WSAStartup(MAKEWORD(2, 2), &wsaData);
 }
 
-bool Client::registerClient(string name)
+bool Client::registerClient(string name, char id[ID_LEN])
 {
 	vector<BYTE> data(MSGCODE_LEN + NAME_LEN);
 	copyNumberToVector(data, MessageCode::RegisterClient, MSGCODE_LEN);
