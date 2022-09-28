@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Header Files\constants">
       <UniqueIdentifier>{4a25d5b0-cb3e-45f6-9f9f-a53074199cf6}</UniqueIdentifier>
     </Filter>
@@ -28,15 +24,19 @@
     <Filter Include="Header Files\request_seriazliers">
       <UniqueIdentifier>{5c05d579-c41e-4098-9b97-99816f7f8e59}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\response_deserializers">
+      <UniqueIdentifier>{f685fea1-c8e4-4f7f-aedf-ee314ce4c86c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="register_client_request_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vector_utils.cpp">
@@ -46,6 +46,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="register_request_serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="request_handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="register_succ_deserializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="headers_deserializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,12 +83,6 @@
     <ClInclude Include="system_constants.h">
       <Filter>Header Files\constants</Filter>
     </ClInclude>
-    <ClInclude Include="register_client_request_handler.h">
-      <Filter>Header Files\requests_handler</Filter>
-    </ClInclude>
-    <ClInclude Include="vector_utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="request_serializer.h">
       <Filter>Header Files\request_seriazliers</Filter>
     </ClInclude>
@@ -88,6 +91,18 @@
     </ClInclude>
     <ClInclude Include="register_request_serializer.h">
       <Filter>Header Files\request_seriazliers</Filter>
+    </ClInclude>
+    <ClInclude Include="response_deserializer.h">
+      <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+    <ClInclude Include="headers_deserializer.h">
+      <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+    <ClInclude Include="register_succ_deserializer.h">
+      <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+    <ClInclude Include="vector_utils.h">
+      <Filter>Header Files\utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

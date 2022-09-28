@@ -129,22 +129,26 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="headers_deserializer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="register_succ_deserializer.cpp" />
     <ClCompile Include="register_request_serializer.cpp" />
-    <ClCompile Include="register_client_request_handler.cpp" />
+    <ClCompile Include="request_handler.cpp" />
     <ClCompile Include="request_header_serializer.cpp" />
     <ClCompile Include="vector_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h" />
+    <ClInclude Include="headers_deserializer.h" />
     <ClInclude Include="msg_code.h" />
+    <ClInclude Include="register_succ_deserializer.h" />
     <ClInclude Include="register_request_serializer.h" />
-    <ClInclude Include="register_client_request_handler.h" />
     <ClInclude Include="request.h" />
     <ClInclude Include="request_handler.h" />
     <ClInclude Include="request_header_serializer.h" />
     <ClInclude Include="request_serializer.h" />
     <ClInclude Include="response.h" />
+    <ClInclude Include="response_deserializer.h" />
     <ClInclude Include="size.h" />
     <ClInclude Include="status.h" />
     <ClInclude Include="system_constants.h" />
