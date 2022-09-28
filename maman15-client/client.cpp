@@ -6,6 +6,7 @@
 #include "size.h"
 #include "msg_code.h"
 #include "status.h"
+#include "system_constants.h"
 
 #define DECIMAL_BASE (10)
 #define ZERO '0'
@@ -65,7 +66,7 @@ bool Client::sendMessageToServer(const vector<BYTE>& data, Status success)
 	return status == success;
 }
 
-Client::Client(string ip, int port) : mIp(ip), mPort(port)
+Client::Client(string ip, int port, RequestHandler* requestHandler) : mIp(ip), mPort(port), mRequestHandler(requestHandler)
 {
 	WSAData wsaData;
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -73,9 +74,12 @@ Client::Client(string ip, int port) : mIp(ip), mPort(port)
 
 bool Client::registerClient(string name, char id[ID_LEN])
 {
-	vector<BYTE> data(MSGCODE_LEN + NAME_LEN);
-	copyNumberToVector(data, MessageCode::RegisterClient, MSGCODE_LEN);
-	copyArrayToVector(data, (BYTE*)name.c_str(), name.length(), MSGCODE_LEN);
+	RegisterRequest request;
+	request.msgCode = MessageCode::RegisterClient;
+	request.version = VERSION;
+	request.payloadSize = NAME_LEN;
+	request.name = name;
 
-	return sendMessageToServer(data, Status::RegisterSuccess);
+	Response res = mRequestHandler->handleRequest(&request);
+	return res.status == Status::RegisterSuccess;
 }
