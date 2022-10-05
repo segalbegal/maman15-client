@@ -135,6 +135,8 @@
     <ClCompile Include="register_request_serializer.cpp" />
     <ClCompile Include="request_handler.cpp" />
     <ClCompile Include="request_header_serializer.cpp" />
+    <ClCompile Include="request_serializer_resolver.cpp" />
+    <ClCompile Include="response_deserializer_resolver.cpp" />
     <ClCompile Include="vector_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -147,12 +149,17 @@
     <ClInclude Include="request_handler.h" />
     <ClInclude Include="request_header_serializer.h" />
     <ClInclude Include="request_serializer.h" />
+    <ClInclude Include="request_serializer_resolver.h" />
     <ClInclude Include="response.h" />
     <ClInclude Include="response_deserializer.h" />
+    <ClInclude Include="response_deserializer_resolver.h" />
     <ClInclude Include="size.h" />
     <ClInclude Include="status.h" />
     <ClInclude Include="system_constants.h" />
     <ClInclude Include="vector_utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="transfer.info" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

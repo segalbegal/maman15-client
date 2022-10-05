@@ -14,22 +14,13 @@ class Client
 private:
 	RequestHandler* mRequestHandler;
 
-	string mIp;
-	int mPort;
-
-	SOCKET connectToServer();
-	void disconnectFromServer(SOCKET sock);
-
-	void copyNumberToVector(vector<BYTE>& source, int num, int len, int offset = 0);
-	void copyArrayToVector(vector<BYTE>& source, BYTE* arr, int len, int offset = 0);
-
-	bool sendMessageToServer(const vector<BYTE>& data, Status success);
+	void saveClientId(string name, BYTE id[ID_LEN]);
 
 public:
-	Client(string ip, int port, RequestHandler* requestHandler);
-	~Client() = default;
+	Client(RequestHandler* requestHandler);
+	~Client();
 
-	bool registerClient(string name, char id[ID_LEN]);
-	bool sendPublicKey();
+	bool registerClient(string name);
+	//bool sendPublicKey();
 };
 

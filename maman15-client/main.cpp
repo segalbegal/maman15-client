@@ -2,6 +2,12 @@
 #include <fstream>
 #include <string>
 #include "client.h"
+// Request serializers
+#include "request_serializer_resolver.h"
+#include "register_request_serializer.h"
+// Response deserializers
+#include "response_deserializer_resolver.h"
+#include "register_succ_deserializer.h"
 
 #define TRANSFER_FILE_NAME "transfer.info"
 #define CONNECTION_DETAILS_DELIMITER ':'
@@ -29,10 +35,21 @@ struct TransferDetails readTransferDetails();
 int main()
 {
 	struct TransferDetails details = readTransferDetails();
-	Client c(details.connectionDetails.ip, details.connectionDetails.port);
+	RequestSerializer* serializer = new RequestSerializerResolver(map<MessageCode, RequestSerializer*>
+	{
+		{MessageCode::RegisterClient, new RegisterRequestSerializer()},
+	});
+	ResponseDeserializer* deserializer = new ResponseDeserializerResolver(map<Status, ResponseDeserializer*>
+	{
+		{Status::RegisterSuccess, new RegisterSuccDeserializer()},
+		{Status::RegisterFailure, new HeadersDeserializer()},
+	});
+
+	RequestHandler* h = new RequestHandler(details.connectionDetails.ip, details.connectionDetails.port, serializer, deserializer);
+	Client c(h);
 
 	char id[ID_LEN] = {0};
-	bool res = c.registerClient(details.clientName, id);
+	bool res = c.registerClient(details.clientName);
 	if (!res)
 	{
 		cout << "Server responded with an error" << endl;

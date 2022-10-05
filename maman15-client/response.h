@@ -13,10 +13,6 @@ typedef struct Response
 	int version;
 } Response;
 
-typedef struct FailureResponse : public Response
-{
-} FailureResponse;
-
 typedef struct RegisterSuccessResponse : public Response
 {
 	BYTE id[ID_LEN];

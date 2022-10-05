@@ -3,6 +3,9 @@
 
 #include "client.h"
 #include <vector>
+#include <fstream>
+#include <iostream>
+
 #include "size.h"
 #include "msg_code.h"
 #include "status.h"
@@ -10,69 +13,30 @@
 
 #define DECIMAL_BASE (10)
 #define ZERO '0'
+#define ME_INFO_FILE "me.info"
 
 using std::to_string;
+using std::ofstream;
+using std::endl;
 
-SOCKET Client::connectToServer()
+void Client::saveClientId(string name, BYTE id[ID_LEN])
 {
-	struct sockaddr_in addr;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(mPort);
-	addr.sin_addr.s_addr = inet_addr(mIp.c_str());
-
-	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) == INVALID_SOCKET)
-	{
-		return -1;
-	}
-
-	return sock;
+	ofstream f(ME_INFO_FILE);
+	f << name << endl;
+	f << id << endl;
+	f.close();
 }
 
-void Client::disconnectFromServer(SOCKET sock)
+Client::Client(RequestHandler* requestHandler) : mRequestHandler(requestHandler)
 {
-	closesocket(sock);
 }
 
-void Client::copyNumberToVector(vector<BYTE>& source, int num, int len, int offset)
+Client::~Client()
 {
-	int nextNum = 0;
-	for (int i = 0; i < len; i++)
-	{
-		nextNum = num % DECIMAL_BASE + ZERO;
-		source[offset + len - i - 1] = nextNum;
-		num /= DECIMAL_BASE;
-	}
+	delete mRequestHandler;
 }
 
-void Client::copyArrayToVector(vector<BYTE>& source, BYTE* arr, int len, int offset)
-{
-	for (int i = 0; i < len; i++)
-	{
-		source[i + offset] = arr[i];
-	}
-}
-
-bool Client::sendMessageToServer(const vector<BYTE>& data, Status success)
-{
-	char resBuf[STATUS_LEN] = {0};
-	SOCKET sock = connectToServer();
-
-	send(sock, (char*)&data[0], data.size(), 0);
-	recv(sock, resBuf, STATUS_LEN, 0);
-	
-	disconnectFromServer(sock);
-	Status status = (Status)std::stoi(string(resBuf));
-	return status == success;
-}
-
-Client::Client(string ip, int port, RequestHandler* requestHandler) : mIp(ip), mPort(port), mRequestHandler(requestHandler)
-{
-	WSAData wsaData;
-	WSAStartup(MAKEWORD(2, 2), &wsaData);
-}
-
-bool Client::registerClient(string name, char id[ID_LEN])
+bool Client::registerClient(string name)
 {
 	RegisterRequest request;
 	request.msgCode = MessageCode::RegisterClient;
@@ -80,6 +44,11 @@ bool Client::registerClient(string name, char id[ID_LEN])
 	request.payloadSize = NAME_LEN;
 	request.name = name;
 
-	Response res = mRequestHandler->handleRequest(&request);
-	return res.status == Status::RegisterSuccess;
+	Response* res = mRequestHandler->handleRequest(&request);
+	if (res->status == Status::RegisterSuccess)
+	{
+		saveClientId(name, ((RegisterSuccessResponse*)res)->id);
+	}
+	
+	return res->status == Status::RegisterSuccess;
 }

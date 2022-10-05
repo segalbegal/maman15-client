@@ -24,12 +24,12 @@
     <Filter Include="Header Files\request_seriazliers">
       <UniqueIdentifier>{5c05d579-c41e-4098-9b97-99816f7f8e59}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Header Files\response_deserializers">
       <UniqueIdentifier>{f685fea1-c8e4-4f7f-aedf-ee314ce4c86c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +55,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="headers_deserializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="request_serializer_resolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="response_deserializer_resolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -104,5 +110,16 @@
     <ClInclude Include="vector_utils.h">
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="request_serializer_resolver.h">
+      <Filter>Header Files\request_seriazliers</Filter>
+    </ClInclude>
+    <ClInclude Include="response_deserializer_resolver.h">
+      <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="transfer.info">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

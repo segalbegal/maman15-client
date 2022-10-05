@@ -32,7 +32,7 @@ Response* RequestHandler::handleRequest(const Request* req)
     if (payloadSize > 0)
     {
         res.resize(res.size() + payloadSize);
-        boost::asio::read(sock, boost::asio::buffer(&res[0] + res.size(), payloadSize));
+        boost::asio::read(sock, boost::asio::buffer(&res[0] + RESPONSE_HEADERS_OFFSET, payloadSize));
     }
 
     sock.close();
