@@ -1,6 +1,3 @@
-#pragma comment(lib, "Ws2_32.lib")
-#pragma warning(disable:4996)
-
 #include "client.h"
 #include <vector>
 #include <fstream>
