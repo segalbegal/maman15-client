@@ -1,30 +1,33 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <boost/asio.hpp>
+#include <WinSock2.h>
 #include "status.h"
+#include "size.h"
+#include "request_handler.h"
+#include "rsa_private_wrapper.h"
 
 using std::string;
 using std::vector;
-using boost::asio::ip::tcp;
-using boost::shared_ptr;
 
 class Client
 {
 private:
-	string mIp;
-	int mPort;
-	tcp::socket* mSock;
+	BYTE mId[ID_LEN];
+	string mName;
+	string mKey;
+	
+	RequestHandler* mRequestHandler;
+	RSAPrivateWrapper* mRsaPrivateWrapper;
 
-	void copyNumberToVector(vector<BYTE>& source, int num, int len, int offset = 0);
-	void copyArrayToVector(vector<BYTE>& source, BYTE* arr, int len, int offset = 0);
-
-	bool sendMessageToServer(const vector<BYTE>& data, Status success);
+	void saveClientId(string name, BYTE id[ID_LEN]);
+	void handlePrivateKey(const BYTE* encryptedKey, int encryptedKeyLen);	
 
 public:
-	Client(string ip, int port);
-	~Client() = default;
+	Client(RequestHandler* requestHandler, RSAPrivateWrapper* rsaPrivateWrapper);
+	~Client();
 
-	bool registerClient(string name);
+	bool registerClient(const string& name);
+	bool sendPublicKey();
 };
 

@@ -9,12 +9,30 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\constants">
+      <UniqueIdentifier>{4a25d5b0-cb3e-45f6-9f9f-a53074199cf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\data">
+      <UniqueIdentifier>{5162dcbc-1115-4029-ab50-25dba7280bea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\requests_handler">
+      <UniqueIdentifier>{5353cd61-09b1-4482-874a-31493fed15ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utilities">
+      <UniqueIdentifier>{ee253193-a178-40a6-b7a1-83b22c8cb618}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\request_seriazliers">
+      <UniqueIdentifier>{5c05d579-c41e-4098-9b97-99816f7f8e59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\response_deserializers">
+      <UniqueIdentifier>{f685fea1-c8e4-4f7f-aedf-ee314ce4c86c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\constants">
-      <UniqueIdentifier>{4a25d5b0-cb3e-45f6-9f9f-a53074199cf6}</UniqueIdentifier>
+    <Filter Include="Header Files\crypto">
+      <UniqueIdentifier>{1783b961-02e5-449e-b884-763a66996a27}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -22,6 +40,39 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vector_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="request_header_serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="register_request_serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="request_handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="register_succ_deserializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="headers_deserializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="request_serializer_resolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="response_deserializer_resolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rsa_private_wrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="send_public_key_request_serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="aes_key_deserializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,5 +89,61 @@
     <ClInclude Include="size.h">
       <Filter>Header Files\constants</Filter>
     </ClInclude>
+    <ClInclude Include="request.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="response.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="request_handler.h">
+      <Filter>Header Files\requests_handler</Filter>
+    </ClInclude>
+    <ClInclude Include="system_constants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="request_serializer.h">
+      <Filter>Header Files\request_seriazliers</Filter>
+    </ClInclude>
+    <ClInclude Include="request_header_serializer.h">
+      <Filter>Header Files\request_seriazliers</Filter>
+    </ClInclude>
+    <ClInclude Include="register_request_serializer.h">
+      <Filter>Header Files\request_seriazliers</Filter>
+    </ClInclude>
+    <ClInclude Include="response_deserializer.h">
+      <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+    <ClInclude Include="headers_deserializer.h">
+      <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+    <ClInclude Include="register_succ_deserializer.h">
+      <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+    <ClInclude Include="vector_utils.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="request_serializer_resolver.h">
+      <Filter>Header Files\request_seriazliers</Filter>
+    </ClInclude>
+    <ClInclude Include="response_deserializer_resolver.h">
+      <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+    <ClInclude Include="rsa_private_wrapper.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="send_public_key_request_serializer.h">
+      <Filter>Header Files\request_seriazliers</Filter>
+    </ClInclude>
+    <ClInclude Include="aes_key_deserializer.h">
+      <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="transfer.info">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="me.info">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

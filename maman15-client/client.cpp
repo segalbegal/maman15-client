@@ -1,60 +1,81 @@
 #include "client.h"
 #include <vector>
+#include <fstream>
+#include <iostream>
+
 #include "size.h"
 #include "msg_code.h"
 #include "status.h"
+#include "system_constants.h"
 
 #define DECIMAL_BASE (10)
 #define ZERO '0'
+#define ME_INFO_FILE "me.info"
 
 using std::to_string;
+using std::ofstream;
+using std::endl;
 
-void Client::copyNumberToVector(vector<BYTE>& source, int num, int len, int offset)
+void Client::saveClientId(string name, BYTE id[ID_LEN])
 {
-	int nextNum = 0;
-	for (int i = 0; i < len; i++)
-	{
-		nextNum = num % DECIMAL_BASE + ZERO;
-		source[offset + len - i - 1] = nextNum;
-		num /= DECIMAL_BASE;
-	}
-}
-
-void Client::copyArrayToVector(vector<BYTE>& source, BYTE* arr, int len, int offset)
-{
-	for (int i = 0; i < len; i++)
-	{
-		source[i + offset] = arr[i];
-	}
-}
-
-bool Client::sendMessageToServer(const vector<BYTE>& data, Status success)
-{
-	char resBuf[STATUS_LEN];
-
-	boost::asio::io_context context;
-	tcp::socket sock(context);
-	tcp::resolver resolver(context);
-
-	boost::asio::connect(sock, resolver.resolve(mIp, to_string(mPort)));
-	boost::asio::write(sock, boost::asio::buffer(data, MSGCODE_LEN + NAME_LEN));
-	boost::asio::read(sock, boost::asio::buffer(resBuf, STATUS_LEN));
+	mName = name;
+	memcpy_s(mId, ID_LEN, id, ID_LEN);
 	
-	sock.close();
-
-	Status status = (Status)std::stoi(string(resBuf));
-	return status == success;
+	ofstream f(ME_INFO_FILE);
+	f << name << endl;
+	f << id << endl;
+	f.close();
 }
 
-Client::Client(string ip, int port) : mIp(ip), mPort(port)
+void Client::handlePrivateKey(const BYTE* encryptedKey, int encryptedKeyLen)
+{
+	mKey = mRsaPrivateWrapper->decrypt(encryptedKey, encryptedKeyLen);
+}
+
+Client::Client(RequestHandler* requestHandler, RSAPrivateWrapper* rsaPrivateWrapper) : mRequestHandler(requestHandler), mRsaPrivateWrapper(rsaPrivateWrapper)
 {
 }
 
-bool Client::registerClient(string name)
+Client::~Client()
 {
-	vector<BYTE> data(MSGCODE_LEN + NAME_LEN);
-	copyNumberToVector(data, MessageCode::RegisterClient, MSGCODE_LEN);
-	copyArrayToVector(data, (BYTE*)name.c_str(), name.length(), MSGCODE_LEN);
+	delete mRequestHandler;
+	delete mRsaPrivateWrapper;
+}
 
-	return sendMessageToServer(data, Status::RegisterSuccess);
+bool Client::registerClient(const string& name)
+{
+	RegisterRequest request;
+	request.msgCode = MessageCode::RegisterClient;
+	request.version = VERSION;
+	request.payloadSize = NAME_LEN;
+	request.name = name;
+
+	Response* res = mRequestHandler->handleRequest(&request);
+	if (res->status == Status::RegisterSuccess)
+	{
+		saveClientId(name, ((RegisterSuccessResponse*)res)->id);
+	}
+	
+	return res->status == Status::RegisterSuccess;
+}
+
+bool Client::sendPublicKey()
+{
+	string key = mRsaPrivateWrapper->getPublicKey();
+	PublicKeyRequest req;
+	memcpy_s(req.id, ID_LEN, mId, ID_LEN);
+	req.msgCode = MessageCode::SendPublicKey;
+	req.version = VERSION;
+	req.name = mName;
+	memcpy_s(req.key, PUBLIC_KEY_LEN, (BYTE*)&key[0], PUBLIC_KEY_LEN);
+	req.payloadSize = NAME_LEN + PUBLIC_KEY_LEN;
+
+	Response* res = mRequestHandler->handleRequest(&req);
+	if (res->status == Status::RecievedPublicKey)
+	{
+		RecievedPublicKeyResponse* pubKeyRes = (RecievedPublicKeyResponse*)res;
+		handlePrivateKey(pubKeyRes->aesKey, pubKeyRes->aesKeyLen);
+	}
+
+	return res->status == Status::RecievedPublicKey;
 }
