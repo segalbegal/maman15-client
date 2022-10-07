@@ -5,9 +5,14 @@
 // Request serializers
 #include "request_serializer_resolver.h"
 #include "register_request_serializer.h"
+#include "send_public_key_request_serializer.h"
 // Response deserializers
 #include "response_deserializer_resolver.h"
 #include "register_succ_deserializer.h"
+#include "aes_key_deserializer.h"
+
+#include <sstream>
+#include <iomanip>
 
 #define TRANSFER_FILE_NAME "transfer.info"
 #define CONNECTION_DETAILS_DELIMITER ':'
@@ -32,25 +37,37 @@ struct TransferDetails
 
 struct TransferDetails readTransferDetails();
 
-int main()
+RequestHandler* createRequestHandler(TransferDetails details)
 {
-	struct TransferDetails details = readTransferDetails();
 	RequestSerializer* serializer = new RequestSerializerResolver(map<MessageCode, RequestSerializer*>
 	{
 		{MessageCode::RegisterClient, new RegisterRequestSerializer()},
+		{MessageCode::SendPublicKey, new SendPublicKeyRequestSerializer()}
 	});
 	ResponseDeserializer* deserializer = new ResponseDeserializerResolver(map<Status, ResponseDeserializer*>
 	{
 		{Status::RegisterSuccess, new RegisterSuccDeserializer()},
 		{Status::RegisterFailure, new HeadersDeserializer()},
+		{Status::RecievedPublicKey, new AesKeyDeserializer()}
 	});
 
-	RequestHandler* h = new RequestHandler(details.connectionDetails.ip, details.connectionDetails.port, serializer, deserializer);
-	Client c(h);
+	return new RequestHandler(details.connectionDetails.ip, details.connectionDetails.port, serializer, deserializer);
+}
+
+int main()
+{
+	TransferDetails details = readTransferDetails();
+	RequestHandler* handler = createRequestHandler(details);
+	Client c(handler, new RSAPrivateWrapper());
 
 	char id[ID_LEN] = {0};
-	bool res = c.registerClient(details.clientName);
-	if (!res)
+	if (!c.registerClient(details.clientName))
+	{
+		cout << "Server responded with an error" << endl;
+		return -1;
+	}
+
+	if (!c.sendPublicKey())
 	{
 		cout << "Server responded with an error" << endl;
 	}

@@ -21,6 +21,8 @@ typedef struct RegisterSuccessResponse : public Response
 typedef struct RecievedPublicKeyResponse : public Response
 {
 	BYTE id[ID_LEN];
+	int aesKeyLen;
+	BYTE* aesKey;
 } RecievedPublicKeyResponse;
 
 typedef struct RecievedValidFile : public Response

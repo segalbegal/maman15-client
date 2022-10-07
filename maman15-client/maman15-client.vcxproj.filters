@@ -31,6 +31,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\crypto">
+      <UniqueIdentifier>{1783b961-02e5-449e-b884-763a66996a27}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -61,6 +64,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="response_deserializer_resolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rsa_private_wrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="send_public_key_request_serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="aes_key_deserializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -114,6 +126,15 @@
       <Filter>Header Files\request_seriazliers</Filter>
     </ClInclude>
     <ClInclude Include="response_deserializer_resolver.h">
+      <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+    <ClInclude Include="rsa_private_wrapper.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="send_public_key_request_serializer.h">
+      <Filter>Header Files\request_seriazliers</Filter>
+    </ClInclude>
+    <ClInclude Include="aes_key_deserializer.h">
       <Filter>Header Files\response_deserializers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,7 +4,7 @@
 vector<BYTE> RequestHeaderSerializer::serializeRequest(const Request* req)
 {
     vector<BYTE> data;
-	VectorUtils::appendIntToVector(data, 0, ID_LEN);
+	VectorUtils::appendBufferToVector(data, req->id, ID_LEN);
 	VectorUtils::appendIntToVector(data, req->version, VERSION_LEN);
 	VectorUtils::appendIntToVector(data, req->msgCode, MSGCODE_LEN);
 	VectorUtils::appendIntToVector(data, req->payloadSize, PAYLOAD_SIZE_LEN);
