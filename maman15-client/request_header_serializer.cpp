@@ -1,6 +1,11 @@
 #include "request_header_serializer.h"
 #include "vector_utils.h"
 
+vector<BYTE> RequestHeaderSerializer::serializeInnerRequest(const Request* req)
+{
+	return vector<BYTE>();
+}
+
 vector<BYTE> RequestHeaderSerializer::serializeRequest(const Request* req)
 {
     vector<BYTE> data;

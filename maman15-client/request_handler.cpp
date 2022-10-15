@@ -28,7 +28,7 @@ Response* RequestHandler::handleRequest(const Request* req)
     
     vector<BYTE> res(VERSION_LEN + STATUS_LEN + PAYLOAD_SIZE_LEN);
     boost::asio::read(sock, boost::asio::buffer(res, res.size()));
-    int payloadSize = VectorUtils::extractIntFromVector(res, PAYLOAD_SIZE_LEN, VERSION_LEN + STATUS_LEN);
+    int payloadSize = VectorUtils::extractNumFromVector(res, PAYLOAD_SIZE_LEN, VERSION_LEN + STATUS_LEN);
     if (payloadSize > 0)
     {
         res.resize(res.size() + payloadSize);

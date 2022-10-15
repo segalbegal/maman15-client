@@ -6,13 +6,12 @@
 #include "request_serializer_resolver.h"
 #include "register_request_serializer.h"
 #include "send_public_key_request_serializer.h"
+#include "send_file_request_serializer.h"
 // Response deserializers
 #include "response_deserializer_resolver.h"
 #include "register_succ_deserializer.h"
 #include "aes_key_deserializer.h"
-
-#include <sstream>
-#include <iomanip>
+#include "send_file_deserializer.h"
 
 #define TRANSFER_FILE_NAME "transfer.info"
 #define CONNECTION_DETAILS_DELIMITER ':'
@@ -24,8 +23,8 @@ using std::endl;
 
 struct ConnectionDetails
 {
-	string ip;
-	int port;
+	string ip = "";
+	int port = 0;
 };
 
 struct TransferDetails
@@ -42,13 +41,18 @@ RequestHandler* createRequestHandler(TransferDetails details)
 	RequestSerializer* serializer = new RequestSerializerResolver(map<MessageCode, RequestSerializer*>
 	{
 		{MessageCode::RegisterClient, new RegisterRequestSerializer()},
-		{MessageCode::SendPublicKey, new SendPublicKeyRequestSerializer()}
+		{MessageCode::SendPublicKey, new SendPublicKeyRequestSerializer()},
+		{MessageCode::SendFile, new SendFileRequestSerializer()},
+		{MessageCode::InvalidCRCRetry, new RequestHeaderSerializer()},
+		{MessageCode::InvalidCRC, new RequestHeaderSerializer()},
 	});
 	ResponseDeserializer* deserializer = new ResponseDeserializerResolver(map<Status, ResponseDeserializer*>
 	{
 		{Status::RegisterSuccess, new RegisterSuccDeserializer()},
 		{Status::RegisterFailure, new HeadersDeserializer()},
-		{Status::RecievedPublicKey, new AesKeyDeserializer()}
+		{Status::RecievedPublicKey, new AesKeyDeserializer()},
+		{Status::RecievedFileCRC, new SendFileDeserializer()},
+		{Status::MessageApproved, new HeadersDeserializer()},
 	});
 
 	return new RequestHandler(details.connectionDetails.ip, details.connectionDetails.port, serializer, deserializer);
@@ -58,16 +62,24 @@ int main()
 {
 	TransferDetails details = readTransferDetails();
 	RequestHandler* handler = createRequestHandler(details);
-	Client c(handler, new RSAPrivateWrapper());
+	Client c(handler, new RSAPrivateWrapper(), new AESPublicWrapper());
 
-	char id[ID_LEN] = {0};
-	if (!c.registerClient(details.clientName))
+	bool hasRegistered = c.registered();
+	if (!hasRegistered)
 	{
-		cout << "Server responded with an error" << endl;
-		return -1;
+		if (!c.registerClient(details.clientName))
+		{
+			cout << "Server responded with an error" << endl;
+			return -1;
+		}
 	}
 
 	if (!c.sendPublicKey())
+	{
+		cout << "Server responded with an error" << endl;
+	}
+
+	if (!c.sendFile(details.fileName))
 	{
 		cout << "Server responded with an error" << endl;
 	}

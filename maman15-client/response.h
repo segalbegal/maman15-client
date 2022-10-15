@@ -2,33 +2,34 @@
 #include <string>
 #include "status.h"
 #include "size.h"
+#include "cksum_utils.h"
 
 using std::string;
 
 typedef unsigned char BYTE;
 
-typedef struct Response
+struct Response
 {
 	Status status;
 	int version;
-} Response;
+};
 
-typedef struct RegisterSuccessResponse : public Response
+struct RegisterSuccessResponse : public Response
 {
 	BYTE id[ID_LEN];
-} RegisterSuccessResponse;
+};
 
-typedef struct RecievedPublicKeyResponse : public Response
+struct RecievedPublicKeyResponse : public Response
 {
 	BYTE id[ID_LEN];
 	int aesKeyLen;
 	BYTE* aesKey;
-} RecievedPublicKeyResponse;
+};
 
-typedef struct RecievedValidFile : public Response
+struct RecievedFileResponse : public Response
 {
 	BYTE id[ID_LEN];
 	int contentSize;
 	string filename;
-	BYTE cksum[CKSUM_LEN];
+	crc cksum;
 };

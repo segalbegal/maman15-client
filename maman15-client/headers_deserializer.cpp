@@ -9,8 +9,8 @@ Response* HeadersDeserializer::deserializeInnerResponse(const vector<BYTE>& sour
 Response* HeadersDeserializer::deserializeResponse(const vector<BYTE>& source)
 {
     Response* res = deserializeInnerResponse(source);
-    res->version = VectorUtils::extractIntFromVector(source, VERSION_LEN, 0);
-    res->status = (Status)VectorUtils::extractIntFromVector(source, STATUS_LEN, VERSION_LEN);
+    res->version = VectorUtils::extractNumFromVector(source, VERSION_LEN, 0);
+    res->status = (Status)VectorUtils::extractNumFromVector(source, STATUS_LEN, VERSION_LEN);
     
     return res;
 }

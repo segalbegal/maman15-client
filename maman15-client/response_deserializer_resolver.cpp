@@ -17,6 +17,6 @@ ResponseDeserializerResolver::~ResponseDeserializerResolver()
 
 Response* ResponseDeserializerResolver::deserializeResponse(const vector<BYTE>& source)
 {
-    Status status = (Status)VectorUtils::extractIntFromVector(source, MSGCODE_LEN, VERSION_LEN);
+    Status status = (Status)VectorUtils::extractNumFromVector(source, MSGCODE_LEN, VERSION_LEN);
     return mDeserializers[status]->deserializeResponse(source);
 }
