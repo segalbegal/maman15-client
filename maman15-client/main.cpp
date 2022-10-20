@@ -45,6 +45,7 @@ RequestHandler* createRequestHandler(TransferDetails details)
 		{MessageCode::SendFile, new SendFileRequestSerializer()},
 		{MessageCode::InvalidCRCRetry, new RequestHeaderSerializer()},
 		{MessageCode::InvalidCRC, new RequestHeaderSerializer()},
+		{MessageCode::ValidCRC, new RequestHeaderSerializer()},
 	});
 	ResponseDeserializer* deserializer = new ResponseDeserializerResolver(map<Status, ResponseDeserializer*>
 	{

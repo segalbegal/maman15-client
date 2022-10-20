@@ -14,7 +14,7 @@
 #define DECIMAL_BASE (10)
 #define ZERO '0'
 #define ME_INFO_FILE "me.info"
-#define SEND_FILE_RETRY (1)
+#define SEND_FILE_RETRY (3)
 
 using std::to_string;
 using std::ofstream;
@@ -100,6 +100,8 @@ bool Client::registered()
 
 bool Client::registerClient(const string& name)
 {
+	mRequestHandler->beginRequest();
+
 	RegisterRequest request;
 	copyClientDetails(&request);
 	request.msgCode = MessageCode::RegisterClient;
@@ -114,11 +116,15 @@ bool Client::registerClient(const string& name)
 	}
 	
 	delete res;
+	mRequestHandler->endRequest();
+
 	return success;
 }
 
 bool Client::sendPublicKey()
 {
+	mRequestHandler->beginRequest();
+
 	auto key = mRsaPrivateWrapper->getPublicKey();
 	PublicKeyRequest request;
 	copyClientDetails(&request);
@@ -138,11 +144,15 @@ bool Client::sendPublicKey()
 	}
 
 	delete res;
+	mRequestHandler->endRequest();
+
 	return success;
 }
 
 bool Client::sendFile(const string& filename)
 {
+	mRequestHandler->beginRequest();
+
 	FileRequest request;
 	copyClientDetails(&request);
 	request.msgCode = MessageCode::SendFile;
@@ -170,9 +180,14 @@ bool Client::sendFile(const string& filename)
 			}
 
 			Request invalidCRCRequest;
-			copyClientDetails(&invalidCRCRequest);
-			invalidCRCRequest.msgCode = MessageCode::InvalidCRCRetry;
-			mRequestHandler->handleRequest(&invalidCRCRequest);
+			
+			if (i + 1 < SEND_FILE_RETRY)
+			{
+				copyClientDetails(&invalidCRCRequest);
+				invalidCRCRequest.msgCode = MessageCode::InvalidCRCRetry;
+				invalidCRCRequest.payloadSize = 0;
+				mRequestHandler->handleRequest(&invalidCRCRequest);
+			}
 		}
 
 		delete res;
@@ -181,7 +196,9 @@ bool Client::sendFile(const string& filename)
 	Request crcRequest;
 	copyClientDetails(&crcRequest);
 	crcRequest.msgCode = isValid ? MessageCode::ValidCRC : MessageCode::InvalidCRC;
+	crcRequest.payloadSize = 0;
 	mRequestHandler->handleRequest(&crcRequest);
+	mRequestHandler->endRequest();
 
 	return isValid;
 }
