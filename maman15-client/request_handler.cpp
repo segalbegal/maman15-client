@@ -1,40 +1,71 @@
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#pragma comment(lib, "Ws2_32.lib")
+
 #include "request_handler.h"
-#include <boost/asio.hpp>
 #include "vector_utils.h"
 
-using boost::asio::ip::tcp;
+#include <iostream>
 
 RequestHandler::RequestHandler(string ip, int port, RequestSerializer* serializer, ResponseDeserializer* deserializer)
-    : mIp(ip), mPort(port), mSerializer(serializer), mDeserializer(deserializer)
+    : mIp(ip), mPort(port), mSerializer(serializer), mDeserializer(deserializer), mServerSock(INVALID_SOCKET)
 {
+    WSAData data;
+    WSAStartup(MAKEWORD(2, 2), &data);
 }
 
 RequestHandler::~RequestHandler()
 {
     delete mSerializer;
     delete mDeserializer;
+
+    WSACleanup();
+}
+
+void RequestHandler::beginRequest()
+{
+    sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr(mIp.c_str());
+    addr.sin_port = htons(mPort);
+
+    auto newSock = socket(AF_INET, SOCK_STREAM, 0);
+    connect(newSock, (struct sockaddr*)&addr, sizeof(addr));
+
+    mServerSock = newSock;
+}
+
+void RequestHandler::endRequest()
+{
+    closesocket(mServerSock);
 }
 
 Response* RequestHandler::handleRequest(const Request* req)
 {
-    boost::asio::io_context context;
-    tcp::socket sock(context);
-    tcp::resolver resolver(context);
-
-    boost::asio::connect(sock, resolver.resolve(mIp, std::to_string(mPort)));
-
     vector<BYTE> data = mSerializer->serializeRequest(req);
-    boost::asio::write(sock, boost::asio::buffer(data, data.size()));
+    std::cout << "Sending request with MessageCode: " << req->msgCode << ", Size: " << data.size() << std::endl;
+    if (send(mServerSock, (char*)&data[0], data.size(), 0) == SOCKET_ERROR)
+    {
+        return nullptr;
+    }
     
-    vector<BYTE> res(VERSION_LEN + STATUS_LEN + PAYLOAD_SIZE_LEN);
-    boost::asio::read(sock, boost::asio::buffer(res, res.size()));
-    int payloadSize = VectorUtils::extractIntFromVector(res, PAYLOAD_SIZE_LEN, VERSION_LEN + STATUS_LEN);
+    vector<BYTE> res(RESPONSE_HEADERS_OFFSET);
+    if (recv(mServerSock, (char*)&res[0], RESPONSE_HEADERS_OFFSET, 0) == SOCKET_ERROR)
+    {
+        return nullptr;
+    }
+    
+    int payloadSize = VectorUtils::extractNumFromVector(res, PAYLOAD_SIZE_LEN, VERSION_LEN + STATUS_LEN);
     if (payloadSize > 0)
     {
-        res.resize(res.size() + payloadSize);
-        boost::asio::read(sock, boost::asio::buffer(&res[0] + RESPONSE_HEADERS_OFFSET, payloadSize));
+        res.resize(RESPONSE_HEADERS_OFFSET + payloadSize);
+        if (recv(mServerSock, (char*)&res[0] + RESPONSE_HEADERS_OFFSET, payloadSize, 0) == SOCKET_ERROR)
+        {
+            return nullptr;
+        }
     }
 
-    sock.close();
-    return mDeserializer->deserializeResponse(res);
+    auto response = mDeserializer->deserializeResponse(res);
+    std::cout << "Recieved response with Status: " << response->status << ", Size: " << res.size() << std::endl;
+
+    return response;
 }

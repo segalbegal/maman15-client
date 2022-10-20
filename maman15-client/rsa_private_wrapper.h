@@ -2,8 +2,10 @@
 #include <osrng.h>
 #include <rsa.h>
 #include <string>
+#include <vector>
 
 using std::string;
+using std::vector;
 
 typedef unsigned char BYTE;
 
@@ -17,6 +19,7 @@ public:
 	RSAPrivateWrapper();
 
 	string getPublicKey();
-	string decrypt(string data);
+
+	string decrypt(const string& data);
 	string decrypt(const BYTE* data, int len);
 };

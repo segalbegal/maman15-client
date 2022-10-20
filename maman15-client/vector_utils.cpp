@@ -66,17 +66,18 @@ string VectorUtils::extractStringFromVector(const vector<BYTE>& source, int len,
 	return (char*)buffer;
 }
 
-int VectorUtils::extractIntFromVector(const vector<BYTE>& source, int len, int offset)
+long VectorUtils::extractNumFromVector(const vector<BYTE>& source, int len, int offset)
 {
 	if (source.size() < offset + len)
 	{
 		return -1;
 	}
 
-	int num = 0;
+	unsigned long num = 0;
 	for (int i = 0; i < len; i++)
 	{
-		num += source[offset + len - i - 1] * pow(BYTE_BASE, i);
+		num *= BYTE_BASE;
+		num += source[offset + i];
 	}
 
 	return num;

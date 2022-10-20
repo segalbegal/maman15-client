@@ -17,7 +17,7 @@ string RSAPrivateWrapper::getPublicKey()
     return publicKey;
 }
 
-string RSAPrivateWrapper::decrypt(string data)
+string RSAPrivateWrapper::decrypt(const string& data)
 {
     std::string decrypted;
     CryptoPP::RSAES_OAEP_SHA_Decryptor d(mPrivateKey);
@@ -30,6 +30,6 @@ string RSAPrivateWrapper::decrypt(const BYTE* data, int len)
 {
     std::string decrypted;
     CryptoPP::RSAES_OAEP_SHA_Decryptor d(mPrivateKey);
-    CryptoPP::StringSource ss_cipher(reinterpret_cast<const CryptoPP::byte*>(data), len, true, new CryptoPP::PK_DecryptorFilter(mRng, d, new CryptoPP::StringSink(decrypted)));
+    CryptoPP::StringSource ss_cipher(reinterpret_cast<const BYTE*>(data), len, true, new CryptoPP::PK_DecryptorFilter(mRng, d, new CryptoPP::StringSink(decrypted)));
     return decrypted;
 }
