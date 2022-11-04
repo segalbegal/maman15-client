@@ -22,8 +22,7 @@ struct RegisterSuccessResponse : public Response
 struct RecievedPublicKeyResponse : public Response
 {
 	BYTE id[ID_LEN];
-	int aesKeyLen;
-	BYTE* aesKey;
+	vector<BYTE> aesKey;
 };
 
 struct RecievedFileResponse : public Response

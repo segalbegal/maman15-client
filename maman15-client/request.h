@@ -14,7 +14,6 @@ struct Request
 	MessageCode msgCode;
 	BYTE id[ID_LEN];
 	int version;
-	int payloadSize;
 };
 
 struct NameRequest : public Request

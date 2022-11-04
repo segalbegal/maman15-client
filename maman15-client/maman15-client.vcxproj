@@ -154,7 +154,6 @@
     <ClCompile Include="send_file_deserializer.cpp" />
     <ClCompile Include="send_file_request_serializer.cpp" />
     <ClCompile Include="send_public_key_request_serializer.cpp" />
-    <ClCompile Include="tests.cpp" />
     <ClCompile Include="vector_utils.cpp" />
   </ItemGroup>
   <ItemGroup>

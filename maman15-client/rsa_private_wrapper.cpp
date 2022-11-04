@@ -7,29 +7,20 @@ RSAPrivateWrapper::RSAPrivateWrapper()
     mPrivateKey.Initialize(mRng, BITS);
 }
 
-string RSAPrivateWrapper::getPublicKey()
+vector<BYTE> RSAPrivateWrapper::getPublicKey()
 {
     CryptoPP::RSAFunction publicKeyFunc(mPrivateKey);
-    std::string publicKey;
-    CryptoPP::StringSink publicSs(publicKey);
+    vector<BYTE> publicKey;
+    CryptoPP::VectorSink publicSs(publicKey);
     publicKeyFunc.Save(publicSs);
 
     return publicKey;
 }
 
-string RSAPrivateWrapper::decrypt(const string& data)
+vector<BYTE> RSAPrivateWrapper::decrypt(const vector<BYTE>& data)
 {
-    std::string decrypted;
+    vector<BYTE> decrypted;
     CryptoPP::RSAES_OAEP_SHA_Decryptor d(mPrivateKey);
-    CryptoPP::StringSource ss_cipher(data, true, new CryptoPP::PK_DecryptorFilter(mRng, d, new CryptoPP::StringSink(decrypted)));
-    
-    return decrypted;
-}
-
-string RSAPrivateWrapper::decrypt(const BYTE* data, int len)
-{
-    std::string decrypted;
-    CryptoPP::RSAES_OAEP_SHA_Decryptor d(mPrivateKey);
-    CryptoPP::StringSource ss_cipher(reinterpret_cast<const BYTE*>(data), len, true, new CryptoPP::PK_DecryptorFilter(mRng, d, new CryptoPP::StringSink(decrypted)));
+    CryptoPP::VectorSource ss_cipher(data, true, new CryptoPP::PK_DecryptorFilter(mRng, d, new CryptoPP::VectorSink(decrypted)));
     return decrypted;
 }

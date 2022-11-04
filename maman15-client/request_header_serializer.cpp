@@ -12,9 +12,9 @@ vector<BYTE> RequestHeaderSerializer::serializeRequest(const Request* req)
 	VectorUtils::appendBufferToVector(data, req->id, ID_LEN);
 	VectorUtils::appendIntToVector(data, req->version, VERSION_LEN);
 	VectorUtils::appendIntToVector(data, req->msgCode, MSGCODE_LEN);
-	VectorUtils::appendIntToVector(data, req->payloadSize, PAYLOAD_SIZE_LEN);
 
 	vector<BYTE> innerData = serializeInnerRequest(req);
+	VectorUtils::appendIntToVector(data, innerData.size(), PAYLOAD_SIZE_LEN);
 	data.insert(data.end(), innerData.begin(), innerData.end());
 
 	return data;

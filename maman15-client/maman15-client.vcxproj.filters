@@ -87,9 +87,6 @@
     <ClCompile Include="send_file_deserializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h">

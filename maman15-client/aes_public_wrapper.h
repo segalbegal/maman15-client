@@ -22,7 +22,6 @@ private:
 public:
 	~AESPublicWrapper();
 
-	void loadKey(const BYTE* key, int length);
-	vector<BYTE> encrypt(const BYTE* data, int length);
+	void loadKey(const vector<BYTE>& key);
 	vector<BYTE> encrypt(const vector<BYTE>& data);
 };
