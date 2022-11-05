@@ -7,6 +7,7 @@
 #include "register_request_serializer.h"
 #include "send_public_key_request_serializer.h"
 #include "send_file_request_serializer.h"
+#include "crc_request_serializer.h"
 // Response deserializers
 #include "response_deserializer_resolver.h"
 #include "register_succ_deserializer.h"
@@ -80,12 +81,12 @@ RequestHandler* createRequestHandler(TransferDetails details)
 {
 	RequestSerializer* serializer = new RequestSerializerResolver(map<MessageCode, RequestSerializer*>
 	{
-		{MessageCode::RegisterClient, new RegisterRequestSerializer()},
+		{ MessageCode::RegisterClient, new RegisterRequestSerializer() },
 		{ MessageCode::SendPublicKey, new SendPublicKeyRequestSerializer() },
 		{ MessageCode::SendFile, new SendFileRequestSerializer() },
-		{ MessageCode::InvalidCRCRetry, new RequestHeaderSerializer() },
-		{ MessageCode::InvalidCRC, new RequestHeaderSerializer() },
-		{ MessageCode::ValidCRC, new RequestHeaderSerializer() },
+		{ MessageCode::InvalidCRCRetry, new CRCRequestSerializer() },
+		{ MessageCode::InvalidCRC, new CRCRequestSerializer() },
+		{ MessageCode::ValidCRC, new CRCRequestSerializer() },
 	});
 	ResponseDeserializer* deserializer = new ResponseDeserializerResolver(map<Status, ResponseDeserializer*>
 	{

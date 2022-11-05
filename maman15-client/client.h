@@ -31,7 +31,8 @@ private:
 	void saveClientId(string name, BYTE id[ID_LEN]);
 	void handlePrivateKey(const vector<BYTE>& encryptedKey);
 	vector<BYTE> loadFileContent(const string& filename);
-	Request createEmptyRequest(MessageCode msgCode);
+
+	CRCRequest createCRCRequest(MessageCode msgCode, const string& filename);
 
 public:
 	Client(RequestHandler* requestHandler, RSAPrivateWrapper* rsaPrivateWrapper, AESPublicWrapper* aesPublicWrapper);

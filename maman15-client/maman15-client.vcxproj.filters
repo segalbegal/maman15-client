@@ -90,6 +90,9 @@
     <ClCompile Include="logging_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="crc_request_serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="logging_utils.h">
       <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="crc_request_serializer.h">
+      <Filter>Header Files\request_serializers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

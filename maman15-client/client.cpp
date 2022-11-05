@@ -83,11 +83,12 @@ vector<BYTE> Client::loadFileContent(const string& filename)
 	return source;
 }
 
-Request Client::createEmptyRequest(MessageCode msgCode)
+CRCRequest Client::createCRCRequest(MessageCode msgCode, const string& filename)
 {
-	Request req;
+	CRCRequest req;
 	copyClientDetails(&req);
 	req.msgCode = msgCode;
+	req.filename = filename;
 	return req;
 }
 
@@ -113,8 +114,6 @@ bool Client::registerClient(const string& name)
 {
 	Logging::info("Registering client! Name: " + name, CLIENT_LOGGER);
 
-	mRequestHandler->beginRequest();
-
 	RegisterRequest request;
 	copyClientDetails(&request);
 	request.msgCode = MessageCode::RegisterClient;
@@ -129,14 +128,12 @@ bool Client::registerClient(const string& name)
 	}
 	
 	delete res;
-	mRequestHandler->endRequest();
-
 	return success;
 }
 
 bool Client::sendPublicKey()
 {
-	mRequestHandler->beginRequest();
+	Logging::info("Sending public key to server", CLIENT_LOGGER);
 
 	auto key = mRsaPrivateWrapper->getPublicKey();
 	PublicKeyRequest request;
@@ -155,14 +152,12 @@ bool Client::sendPublicKey()
 	}
 
 	delete res;
-	mRequestHandler->endRequest();
-
 	return success;
 }
 
 bool Client::sendFile(const string& filename)
 {
-	mRequestHandler->beginRequest();
+	Logging::info("Sending file to server. FileName: " + filename, CLIENT_LOGGER);
 
 	FileRequest request;
 	copyClientDetails(&request);
@@ -170,7 +165,7 @@ bool Client::sendFile(const string& filename)
 	request.fileName = filename;
 	auto data = loadFileContent(filename);
 	request.content = mAesPublicWrapper->encrypt(data);
-	auto invalidCRCRequest = createEmptyRequest(MessageCode::InvalidCRCRetry);;
+	auto invalidCRCRequest = createCRCRequest(MessageCode::InvalidCRCRetry, filename);;
 
 	auto crc = CksumUtils::calculateCRC32Cksum(data);
 	auto isValid = false;
@@ -196,9 +191,8 @@ bool Client::sendFile(const string& filename)
 		delete res;
 	}
 
-	auto crcRequest = createEmptyRequest(isValid ? MessageCode::ValidCRC : MessageCode::InvalidCRC);
+	auto crcRequest = createCRCRequest(isValid ? MessageCode::ValidCRC : MessageCode::InvalidCRC, filename);
 	mRequestHandler->handleRequest(&crcRequest);
-	mRequestHandler->endRequest();
 
 	return isValid;
 }

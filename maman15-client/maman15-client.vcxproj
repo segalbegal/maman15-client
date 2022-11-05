@@ -142,6 +142,7 @@
     <ClCompile Include="aes_public_wrapper.cpp" />
     <ClCompile Include="cksum_utils.cpp" />
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="crc_request_serializer.cpp" />
     <ClCompile Include="headers_deserializer.cpp" />
     <ClCompile Include="logging_utils.cpp" />
     <ClCompile Include="main.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="aes_public_wrapper.h" />
     <ClInclude Include="cksum_utils.h" />
     <ClInclude Include="client.h" />
+    <ClInclude Include="crc_request_serializer.h" />
     <ClInclude Include="headers_deserializer.h" />
     <ClInclude Include="logging_utils.h" />
     <ClInclude Include="msg_code.h" />

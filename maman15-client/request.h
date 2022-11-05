@@ -35,3 +35,8 @@ struct FileRequest : public Request
 	string fileName;
 	vector<BYTE> content;
 };
+
+struct CRCRequest : public Request
+{
+	string filename;
+};

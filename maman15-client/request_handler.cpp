@@ -26,7 +26,7 @@ RequestHandler::~RequestHandler()
     WSACleanup();
 }
 
-void RequestHandler::beginRequest()
+void RequestHandler::connectToServer()
 {
     sockaddr_in addr;
     addr.sin_family = AF_INET;
@@ -39,13 +39,10 @@ void RequestHandler::beginRequest()
     mServerSock = newSock;
 }
 
-void RequestHandler::endRequest()
-{
-    closesocket(mServerSock);
-}
-
 Response* RequestHandler::handleRequest(const Request* req)
 {
+    connectToServer();
+
     vector<BYTE> data = mSerializer->serializeRequest(req);
     string reqMessage = string("Sending request with MessageCode: ") + std::to_string(req->msgCode) + ", Size: " + std::to_string(data.size());
     Logging::debug(reqMessage, REQUEST_HANDLER_LOGGER);
@@ -69,9 +66,11 @@ Response* RequestHandler::handleRequest(const Request* req)
             return nullptr;
         }
     }
+    closesocket(mServerSock);
 
     auto response = mDeserializer->deserializeResponse(res);
     string recMessage = "Recieved response with Status: " + std::to_string(response->status) + ", Size: " + std::to_string(res.size());
     Logging::debug(recMessage, REQUEST_HANDLER_LOGGER);
+    
     return response;
 }
