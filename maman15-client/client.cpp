@@ -92,6 +92,12 @@ CRCRequest Client::createCRCRequest(MessageCode msgCode, const string& filename)
 	return req;
 }
 
+string Client::extractFileName(const string& filepath)
+{
+	std::filesystem::path p(filepath);
+	return p.filename().string();
+}
+
 Client::Client(RequestHandler* requestHandler, RSAPrivateWrapper* rsaPrivateWrapper, AESPublicWrapper* aesPublicWrapper) 
 	: mRequestHandler(requestHandler), mRsaPrivateWrapper(rsaPrivateWrapper), mAesPublicWrapper(aesPublicWrapper)
 {
@@ -157,12 +163,10 @@ bool Client::sendPublicKey()
 
 bool Client::sendFile(const string& filename)
 {
-	Logging::info("Sending file to server. FileName: " + filename, CLIENT_LOGGER);
-
 	FileRequest request;
 	copyClientDetails(&request);
 	request.msgCode = MessageCode::SendFile;
-	request.fileName = filename;
+	request.fileName = extractFileName(filename);
 	auto data = loadFileContent(filename);
 	request.content = mAesPublicWrapper->encrypt(data);
 	auto invalidCRCRequest = createCRCRequest(MessageCode::InvalidCRCRetry, filename);;
@@ -171,6 +175,7 @@ bool Client::sendFile(const string& filename)
 	auto isValid = false;
 	for (int i = 0; i < SEND_FILE_RETRY && !isValid; i++)
 	{
+		Logging::info("Sending file to server. FileName: " + request.fileName, CLIENT_LOGGER);
 		auto res = mRequestHandler->handleRequest(&request);
 		auto success = res->status == Status::RecievedFileCRC;
 		if (success)

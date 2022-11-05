@@ -33,6 +33,7 @@ private:
 	vector<BYTE> loadFileContent(const string& filename);
 
 	CRCRequest createCRCRequest(MessageCode msgCode, const string& filename);
+	string extractFileName(const string& filepath);
 
 public:
 	Client(RequestHandler* requestHandler, RSAPrivateWrapper* rsaPrivateWrapper, AESPublicWrapper* aesPublicWrapper);
