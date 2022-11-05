@@ -143,6 +143,7 @@
     <ClCompile Include="cksum_utils.cpp" />
     <ClCompile Include="client.cpp" />
     <ClCompile Include="headers_deserializer.cpp" />
+    <ClCompile Include="logging_utils.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="register_succ_deserializer.cpp" />
     <ClCompile Include="register_request_serializer.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="cksum_utils.h" />
     <ClInclude Include="client.h" />
     <ClInclude Include="headers_deserializer.h" />
+    <ClInclude Include="logging_utils.h" />
     <ClInclude Include="msg_code.h" />
     <ClInclude Include="register_succ_deserializer.h" />
     <ClInclude Include="register_request_serializer.h" />

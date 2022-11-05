@@ -12,6 +12,8 @@
 #include "register_succ_deserializer.h"
 #include "aes_key_deserializer.h"
 #include "send_file_deserializer.h"
+// Logging
+#include "logging_utils.h"
 
 #define TRANSFER_FILE_NAME "transfer.info"
 #define CONNECTION_DETAILS_DELIMITER ':'
@@ -34,34 +36,20 @@ struct TransferDetails
 	string fileName;
 };
 
+void initializeLogging();
 struct TransferDetails readTransferDetails();
-
-RequestHandler* createRequestHandler(TransferDetails details)
-{
-	RequestSerializer* serializer = new RequestSerializerResolver(map<MessageCode, RequestSerializer*>
-	{
-		{MessageCode::RegisterClient, new RegisterRequestSerializer()},
-		{MessageCode::SendPublicKey, new SendPublicKeyRequestSerializer()},
-		{MessageCode::SendFile, new SendFileRequestSerializer()},
-		{MessageCode::InvalidCRCRetry, new RequestHeaderSerializer()},
-		{MessageCode::InvalidCRC, new RequestHeaderSerializer()},
-		{MessageCode::ValidCRC, new RequestHeaderSerializer()},
-	});
-	ResponseDeserializer* deserializer = new ResponseDeserializerResolver(map<Status, ResponseDeserializer*>
-	{
-		{Status::RegisterSuccess, new RegisterSuccDeserializer()},
-		{Status::RegisterFailure, new HeadersDeserializer()},
-		{Status::RecievedPublicKey, new AesKeyDeserializer()},
-		{Status::RecievedFileCRC, new SendFileDeserializer()},
-		{Status::MessageApproved, new HeadersDeserializer()},
-	});
-
-	return new RequestHandler(details.connectionDetails.ip, details.connectionDetails.port, serializer, deserializer);
-}
+RequestHandler* createRequestHandler(TransferDetails details);
 
 int main()
 {
-	TransferDetails details = readTransferDetails();
+	initializeLogging();
+	Logging::debug("Some debug message", CLIENT_LOGGER);
+	Logging::info("Some info message", CLIENT_LOGGER);
+	Logging::warn("A WARNING", CLIENT_LOGGER);
+	Logging::error("An ERROR!!", CLIENT_LOGGER);
+	Logging::critical("SYSTEM ERROR", CLIENT_LOGGER);
+
+	/*TransferDetails details = readTransferDetails();
 	RequestHandler* handler = createRequestHandler(details);
 	Client c(handler, new RSAPrivateWrapper(), new AESPublicWrapper());
 
@@ -83,9 +71,39 @@ int main()
 	if (!c.sendFile(details.fileName))
 	{
 		cout << "Server responded with an error" << endl;
-	}
+	}*/
 
 	return 0;
+}
+
+void initializeLogging()
+{
+	Logging::initialize();
+	Logging::addLogger(CLIENT_LOGGER, "client.log", LogLevel::Info);
+	Logging::addLogger(CLIENT_LOGGER, "", LogLevel::Debug);
+}
+
+RequestHandler* createRequestHandler(TransferDetails details)
+{
+	RequestSerializer* serializer = new RequestSerializerResolver(map<MessageCode, RequestSerializer*>
+	{
+		{MessageCode::RegisterClient, new RegisterRequestSerializer()},
+		{ MessageCode::SendPublicKey, new SendPublicKeyRequestSerializer() },
+		{ MessageCode::SendFile, new SendFileRequestSerializer() },
+		{ MessageCode::InvalidCRCRetry, new RequestHeaderSerializer() },
+		{ MessageCode::InvalidCRC, new RequestHeaderSerializer() },
+		{ MessageCode::ValidCRC, new RequestHeaderSerializer() },
+	});
+	ResponseDeserializer* deserializer = new ResponseDeserializerResolver(map<Status, ResponseDeserializer*>
+	{
+		{Status::RegisterSuccess, new RegisterSuccDeserializer()},
+		{ Status::RegisterFailure, new HeadersDeserializer() },
+		{ Status::RecievedPublicKey, new AesKeyDeserializer() },
+		{ Status::RecievedFileCRC, new SendFileDeserializer() },
+		{ Status::MessageApproved, new HeadersDeserializer() },
+	});
+
+	return new RequestHandler(details.connectionDetails.ip, details.connectionDetails.port, serializer, deserializer);
 }
 
 struct TransferDetails readTransferDetails()

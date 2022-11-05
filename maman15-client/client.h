@@ -8,6 +8,8 @@
 #include "rsa_private_wrapper.h"
 #include "aes_public_wrapper.h"
 
+#define CLIENT_LOGGER "client"
+
 using std::string;
 using std::vector;
 

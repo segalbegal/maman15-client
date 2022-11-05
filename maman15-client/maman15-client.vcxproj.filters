@@ -87,6 +87,9 @@
     <ClCompile Include="send_file_deserializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="logging_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="send_file_deserializer.h">
       <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+    <ClInclude Include="logging_utils.h">
+      <Filter>Header Files\utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

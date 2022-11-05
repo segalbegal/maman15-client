@@ -10,6 +10,7 @@
 #include "status.h"
 #include "system_constants.h"
 #include "cksum_utils.h"
+#include "logging_utils.h"
 
 #define DECIMAL_BASE (10)
 #define ZERO '0'
@@ -110,6 +111,8 @@ bool Client::registered()
 
 bool Client::registerClient(const string& name)
 {
+	Logging::info("Registering client! Name: " + name, CLIENT_LOGGER);
+
 	mRequestHandler->beginRequest();
 
 	RegisterRequest request;
@@ -121,6 +124,7 @@ bool Client::registerClient(const string& name)
 	auto success = res->status == Status::RegisterSuccess;
 	if (success)
 	{
+		Logging::info("Cleint registered successfully! Name: " + name, CLIENT_LOGGER);
 		saveClientId(name, ((RegisterSuccessResponse*)res)->id);
 	}
 	
