@@ -10,6 +10,7 @@
 #include "status.h"
 #include "system_constants.h"
 #include "cksum_utils.h"
+#include "logging_utils.h"
 
 #define DECIMAL_BASE (10)
 #define ZERO '0'
@@ -59,13 +60,13 @@ void Client::saveClientId(string name, BYTE id[ID_LEN])
 	f.close();
 }
 
-void Client::handlePrivateKey(const BYTE* encryptedKey, int encryptedKeyLen)
+void Client::handlePrivateKey(const vector<BYTE>& encryptedKey)
 {
-	mKey = mRsaPrivateWrapper->decrypt(encryptedKey, encryptedKeyLen);
-	mAesPublicWrapper->loadKey((BYTE*)&mKey[0], mKey.length());
+	mKey = mRsaPrivateWrapper->decrypt(encryptedKey);
+	mAesPublicWrapper->loadKey(mKey);
 }
 
-void Client::loadFileContent(vector<BYTE>& source, const string& filename)
+vector<BYTE> Client::loadFileContent(const string& filename)
 {
 	ifstream f(filename, ios::binary | ios::in);
 	if (!f.is_open())
@@ -75,9 +76,26 @@ void Client::loadFileContent(vector<BYTE>& source, const string& filename)
 	}
 
 	auto fileSize = std::filesystem::file_size(std::filesystem::path(filename));
-	source.resize(fileSize);
+	vector<BYTE> source(fileSize);
 	f.read((char*)&source[0], fileSize);
 	f.close();
+
+	return source;
+}
+
+CRCRequest Client::createCRCRequest(MessageCode msgCode, const string& filename)
+{
+	CRCRequest req;
+	copyClientDetails(&req);
+	req.msgCode = msgCode;
+	req.filename = filename;
+	return req;
+}
+
+string Client::extractFileName(const string& filepath)
+{
+	std::filesystem::path p(filepath);
+	return p.filename().string();
 }
 
 Client::Client(RequestHandler* requestHandler, RSAPrivateWrapper* rsaPrivateWrapper, AESPublicWrapper* aesPublicWrapper) 
@@ -100,30 +118,28 @@ bool Client::registered()
 
 bool Client::registerClient(const string& name)
 {
-	mRequestHandler->beginRequest();
+	Logging::info("Registering client! Name: " + name, CLIENT_LOGGER);
 
 	RegisterRequest request;
 	copyClientDetails(&request);
 	request.msgCode = MessageCode::RegisterClient;
-	request.payloadSize = NAME_LEN;
 	request.name = name;
-
+		
 	auto res = mRequestHandler->handleRequest(&request);
 	auto success = res->status == Status::RegisterSuccess;
 	if (success)
 	{
+		Logging::info("Cleint registered successfully! Name: " + name, CLIENT_LOGGER);
 		saveClientId(name, ((RegisterSuccessResponse*)res)->id);
 	}
 	
 	delete res;
-	mRequestHandler->endRequest();
-
 	return success;
 }
 
 bool Client::sendPublicKey()
 {
-	mRequestHandler->beginRequest();
+	Logging::info("Sending public key to server", CLIENT_LOGGER);
 
 	auto key = mRsaPrivateWrapper->getPublicKey();
 	PublicKeyRequest request;
@@ -131,7 +147,6 @@ bool Client::sendPublicKey()
 	request.msgCode = MessageCode::SendPublicKey;
 	request.name = mName;
 	memcpy_s(request.key, PUBLIC_KEY_LEN, (BYTE*)&key[0], PUBLIC_KEY_LEN);
-	request.payloadSize = NAME_LEN + PUBLIC_KEY_LEN;
 
 	auto res = mRequestHandler->handleRequest(&request);
 	auto success = res->status == Status::RecievedPublicKey;
@@ -139,37 +154,30 @@ bool Client::sendPublicKey()
 	if (success)
 	{
 		auto pubKeyRes = (RecievedPublicKeyResponse*)res;
-		handlePrivateKey((BYTE*)pubKeyRes->aesKey, pubKeyRes->aesKeyLen);
-		delete[] pubKeyRes->aesKey;
+		handlePrivateKey(pubKeyRes->aesKey);
 	}
 
 	delete res;
-	mRequestHandler->endRequest();
-
 	return success;
 }
 
 bool Client::sendFile(const string& filename)
 {
-	mRequestHandler->beginRequest();
-
 	FileRequest request;
 	copyClientDetails(&request);
 	request.msgCode = MessageCode::SendFile;
-	request.fileName = filename;
-	vector<BYTE> data;
-	loadFileContent(data, filename);
+	request.fileName = extractFileName(filename);
+	auto data = loadFileContent(filename);
 	request.content = mAesPublicWrapper->encrypt(data);
-	request.payloadSize = ID_LEN + FILENAME_LEN + request.content.size();
-	
-	auto crc = CksumUtils::calculateCRC32Cksum(data);
+	auto invalidCRCRequest = createCRCRequest(MessageCode::InvalidCRCRetry, filename);;
 
-	bool isValid = false;
+	auto crc = CksumUtils::calculateCRC32Cksum(data);
+	auto isValid = false;
 	for (int i = 0; i < SEND_FILE_RETRY && !isValid; i++)
 	{
+		Logging::info("Sending file to server. FileName: " + request.fileName, CLIENT_LOGGER);
 		auto res = mRequestHandler->handleRequest(&request);
 		auto success = res->status == Status::RecievedFileCRC;
-
 		if (success)
 		{
 			auto fileRes = (RecievedFileResponse*)res;
@@ -178,14 +186,9 @@ bool Client::sendFile(const string& filename)
 				isValid = true;
 				continue;
 			}
-
-			Request invalidCRCRequest;
 			
 			if (i + 1 < SEND_FILE_RETRY)
 			{
-				copyClientDetails(&invalidCRCRequest);
-				invalidCRCRequest.msgCode = MessageCode::InvalidCRCRetry;
-				invalidCRCRequest.payloadSize = 0;
 				mRequestHandler->handleRequest(&invalidCRCRequest);
 			}
 		}
@@ -193,12 +196,8 @@ bool Client::sendFile(const string& filename)
 		delete res;
 	}
 
-	Request crcRequest;
-	copyClientDetails(&crcRequest);
-	crcRequest.msgCode = isValid ? MessageCode::ValidCRC : MessageCode::InvalidCRC;
-	crcRequest.payloadSize = 0;
+	auto crcRequest = createCRCRequest(isValid ? MessageCode::ValidCRC : MessageCode::InvalidCRC, filename);
 	mRequestHandler->handleRequest(&crcRequest);
-	mRequestHandler->endRequest();
 
 	return isValid;
 }

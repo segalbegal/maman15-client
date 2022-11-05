@@ -14,7 +14,6 @@ struct Request
 	MessageCode msgCode;
 	BYTE id[ID_LEN];
 	int version;
-	int payloadSize;
 };
 
 struct NameRequest : public Request
@@ -35,4 +34,9 @@ struct FileRequest : public Request
 {
 	string fileName;
 	vector<BYTE> content;
+};
+
+struct CRCRequest : public Request
+{
+	string filename;
 };

@@ -87,7 +87,10 @@
     <ClCompile Include="send_file_deserializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests.cpp">
+    <ClCompile Include="logging_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="crc_request_serializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -163,6 +166,12 @@
     </ClInclude>
     <ClInclude Include="send_file_deserializer.h">
       <Filter>Header Files\response_deserializers</Filter>
+    </ClInclude>
+    <ClInclude Include="logging_utils.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="crc_request_serializer.h">
+      <Filter>Header Files\request_serializers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

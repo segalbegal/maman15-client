@@ -7,19 +7,21 @@
 #include "register_request_serializer.h"
 #include "send_public_key_request_serializer.h"
 #include "send_file_request_serializer.h"
+#include "crc_request_serializer.h"
 // Response deserializers
 #include "response_deserializer_resolver.h"
 #include "register_succ_deserializer.h"
 #include "aes_key_deserializer.h"
 #include "send_file_deserializer.h"
+// Logging
+#include "logging_utils.h"
 
 #define TRANSFER_FILE_NAME "transfer.info"
+#define LOG_FILE "client.log"
 #define CONNECTION_DETAILS_DELIMITER ':'
 
 using std::string;
 using std::ifstream;
-using std::cout;
-using std::endl;
 
 struct ConnectionDetails
 {
@@ -34,33 +36,13 @@ struct TransferDetails
 	string fileName;
 };
 
+void initializeLogging();
 struct TransferDetails readTransferDetails();
-
-RequestHandler* createRequestHandler(TransferDetails details)
-{
-	RequestSerializer* serializer = new RequestSerializerResolver(map<MessageCode, RequestSerializer*>
-	{
-		{MessageCode::RegisterClient, new RegisterRequestSerializer()},
-		{MessageCode::SendPublicKey, new SendPublicKeyRequestSerializer()},
-		{MessageCode::SendFile, new SendFileRequestSerializer()},
-		{MessageCode::InvalidCRCRetry, new RequestHeaderSerializer()},
-		{MessageCode::InvalidCRC, new RequestHeaderSerializer()},
-		{MessageCode::ValidCRC, new RequestHeaderSerializer()},
-	});
-	ResponseDeserializer* deserializer = new ResponseDeserializerResolver(map<Status, ResponseDeserializer*>
-	{
-		{Status::RegisterSuccess, new RegisterSuccDeserializer()},
-		{Status::RegisterFailure, new HeadersDeserializer()},
-		{Status::RecievedPublicKey, new AesKeyDeserializer()},
-		{Status::RecievedFileCRC, new SendFileDeserializer()},
-		{Status::MessageApproved, new HeadersDeserializer()},
-	});
-
-	return new RequestHandler(details.connectionDetails.ip, details.connectionDetails.port, serializer, deserializer);
-}
+RequestHandler* createRequestHandler(TransferDetails details);
 
 int main()
 {
+	initializeLogging();
 	TransferDetails details = readTransferDetails();
 	RequestHandler* handler = createRequestHandler(details);
 	Client c(handler, new RSAPrivateWrapper(), new AESPublicWrapper());
@@ -70,22 +52,52 @@ int main()
 	{
 		if (!c.registerClient(details.clientName))
 		{
-			cout << "Server responded with an error" << endl;
+			Logging::error("Server responded with an error", CLIENT_LOGGER);
 			return -1;
 		}
 	}
 
 	if (!c.sendPublicKey())
 	{
-		cout << "Server responded with an error" << endl;
+		Logging::error("Server responded with an error", CLIENT_LOGGER);
 	}
 
 	if (!c.sendFile(details.fileName))
 	{
-		cout << "Server responded with an error" << endl;
+		Logging::error("Server responded with an error", CLIENT_LOGGER);
 	}
 
 	return 0;
+}
+
+void initializeLogging()
+{
+	Logging::initialize();
+	Logging::addLogger(CLIENT_LOGGER, LOG_FILE, LogLevel::Debug);
+	Logging::addLogger(CLIENT_LOGGER, LogLevel::Debug);
+}
+
+RequestHandler* createRequestHandler(TransferDetails details)
+{
+	RequestSerializer* serializer = new RequestSerializerResolver(map<MessageCode, RequestSerializer*>
+	{
+		{ MessageCode::RegisterClient, new RegisterRequestSerializer() },
+		{ MessageCode::SendPublicKey, new SendPublicKeyRequestSerializer() },
+		{ MessageCode::SendFile, new SendFileRequestSerializer() },
+		{ MessageCode::InvalidCRCRetry, new CRCRequestSerializer() },
+		{ MessageCode::InvalidCRC, new CRCRequestSerializer() },
+		{ MessageCode::ValidCRC, new CRCRequestSerializer() },
+	});
+	ResponseDeserializer* deserializer = new ResponseDeserializerResolver(map<Status, ResponseDeserializer*>
+	{
+		{ Status::RegisterSuccess, new RegisterSuccDeserializer() },
+		{ Status::RegisterFailure, new HeadersDeserializer() },
+		{ Status::RecievedPublicKey, new AesKeyDeserializer() },
+		{ Status::RecievedFileCRC, new SendFileDeserializer() },
+		{ Status::MessageApproved, new HeadersDeserializer() },
+	});
+
+	return new RequestHandler(details.connectionDetails.ip, details.connectionDetails.port, serializer, deserializer);
 }
 
 struct TransferDetails readTransferDetails()
@@ -95,7 +107,8 @@ struct TransferDetails readTransferDetails()
 
 	if (!f.is_open())
 	{
-		cout << "File " << TRANSFER_FILE_NAME << " does not exists!" << endl;
+		string message = string("File ") + TRANSFER_FILE_NAME + " does not exists!";
+		Logging::error(message, CLIENT_LOGGER);
 		return tranDet;
 	}
 	

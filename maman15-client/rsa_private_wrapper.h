@@ -18,8 +18,6 @@ private:
 public:
 	RSAPrivateWrapper();
 
-	string getPublicKey();
-
-	string decrypt(const string& data);
-	string decrypt(const BYTE* data, int len);
+	vector<BYTE> getPublicKey();
+	vector<BYTE> decrypt(const vector<BYTE>& data);
 };

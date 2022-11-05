@@ -8,6 +8,8 @@
 #include "rsa_private_wrapper.h"
 #include "aes_public_wrapper.h"
 
+#define CLIENT_LOGGER "client"
+
 using std::string;
 using std::vector;
 
@@ -17,7 +19,7 @@ private:
 	bool mIsRegistered;
 	BYTE mId[ID_LEN] = {0};
 	string mName;
-	string mKey;
+	vector<BYTE> mKey;
 	
 	RequestHandler* mRequestHandler;
 	RSAPrivateWrapper* mRsaPrivateWrapper;
@@ -27,9 +29,12 @@ private:
 
 	void copyClientDetails(Request* req);
 	void saveClientId(string name, BYTE id[ID_LEN]);
-	void handlePrivateKey(const BYTE* encryptedKey, int encryptedKeyLen);	
-	void loadFileContent(vector<BYTE>& source, const string& filename);
-	
+	void handlePrivateKey(const vector<BYTE>& encryptedKey);
+	vector<BYTE> loadFileContent(const string& filename);
+
+	CRCRequest createCRCRequest(MessageCode msgCode, const string& filename);
+	string extractFileName(const string& filepath);
+
 public:
 	Client(RequestHandler* requestHandler, RSAPrivateWrapper* rsaPrivateWrapper, AESPublicWrapper* aesPublicWrapper);
 	~Client();

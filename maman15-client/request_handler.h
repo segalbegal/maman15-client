@@ -18,12 +18,11 @@ private:
 	RequestSerializer* mSerializer;
 	ResponseDeserializer* mDeserializer;
 
+	void connectToServer();
+
 public:
 	RequestHandler(string ip, int port, RequestSerializer* serializer, ResponseDeserializer* deserializer);
 	~RequestHandler();
 
-	void beginRequest();
-	void endRequest();
-	
 	Response* handleRequest(const Request* req);
 };

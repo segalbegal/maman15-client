@@ -6,9 +6,8 @@ Response* AesKeyDeserializer::deserializeInnerResponse(const vector<BYTE>& sourc
     RecievedPublicKeyResponse* res = new RecievedPublicKeyResponse;
     int payloadSize = VectorUtils::extractNumFromVector(source, PAYLOAD_SIZE_LEN, VERSION_LEN + STATUS_LEN);
     int aesKeySize = payloadSize - ID_LEN;
-    res->aesKey = new BYTE[aesKeySize];
-    VectorUtils::extractBufferFromVector(source, res->aesKey, aesKeySize, RESPONSE_HEADERS_OFFSET + ID_LEN);
-    res->aesKeyLen = aesKeySize;
+    res->aesKey.resize(aesKeySize);
+    VectorUtils::extractBufferFromVector(source, &res->aesKey[0], aesKeySize, RESPONSE_HEADERS_OFFSET + ID_LEN);
 
     return res;
 }
