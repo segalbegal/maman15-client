@@ -76,10 +76,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Program Files\zlib\msvc2017_32\include\zlib;C:\Program Files\cryptlib;C:\Program Files\boost\boost_1_80_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files\zlib\msvc2017_32\lib\zlib;C:\Program Files\cryptlib\Win32\Output\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cryptlib.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -104,10 +110,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_80_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -127,9 +138,57 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="aes_key_deserializer.cpp" />
+    <ClCompile Include="aes_public_wrapper.cpp" />
+    <ClCompile Include="cksum_utils.cpp" />
+    <ClCompile Include="client.cpp" />
+    <ClCompile Include="crc_request_serializer.cpp" />
+    <ClCompile Include="headers_deserializer.cpp" />
+    <ClCompile Include="logging_utils.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="register_succ_deserializer.cpp" />
+    <ClCompile Include="register_request_serializer.cpp" />
+    <ClCompile Include="request_handler.cpp" />
+    <ClCompile Include="request_header_serializer.cpp" />
+    <ClCompile Include="request_serializer_resolver.cpp" />
+    <ClCompile Include="response_deserializer_resolver.cpp" />
+    <ClCompile Include="rsa_private_wrapper.cpp" />
+    <ClCompile Include="send_file_deserializer.cpp" />
+    <ClCompile Include="send_file_request_serializer.cpp" />
+    <ClCompile Include="send_public_key_request_serializer.cpp" />
+    <ClCompile Include="vector_utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="aes_key_deserializer.h" />
+    <ClInclude Include="aes_public_wrapper.h" />
+    <ClInclude Include="cksum_utils.h" />
+    <ClInclude Include="client.h" />
+    <ClInclude Include="crc_request_serializer.h" />
+    <ClInclude Include="headers_deserializer.h" />
+    <ClInclude Include="logging_utils.h" />
+    <ClInclude Include="msg_code.h" />
+    <ClInclude Include="register_succ_deserializer.h" />
+    <ClInclude Include="register_request_serializer.h" />
+    <ClInclude Include="request.h" />
+    <ClInclude Include="request_handler.h" />
+    <ClInclude Include="request_header_serializer.h" />
+    <ClInclude Include="request_serializer.h" />
+    <ClInclude Include="request_serializer_resolver.h" />
+    <ClInclude Include="response.h" />
+    <ClInclude Include="response_deserializer.h" />
+    <ClInclude Include="response_deserializer_resolver.h" />
+    <ClInclude Include="rsa_private_wrapper.h" />
+    <ClInclude Include="send_file_deserializer.h" />
+    <ClInclude Include="send_file_request_serializer.h" />
+    <ClInclude Include="send_public_key_request_serializer.h" />
+    <ClInclude Include="size.h" />
+    <ClInclude Include="status.h" />
+    <ClInclude Include="system_constants.h" />
+    <ClInclude Include="vector_utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="transfer.info" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
