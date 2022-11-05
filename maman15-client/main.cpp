@@ -16,12 +16,11 @@
 #include "logging_utils.h"
 
 #define TRANSFER_FILE_NAME "transfer.info"
+#define LOG_FILE "client.log"
 #define CONNECTION_DETAILS_DELIMITER ':'
 
 using std::string;
 using std::ifstream;
-using std::cout;
-using std::endl;
 
 struct ConnectionDetails
 {
@@ -43,13 +42,7 @@ RequestHandler* createRequestHandler(TransferDetails details);
 int main()
 {
 	initializeLogging();
-	Logging::debug("Some debug message", CLIENT_LOGGER);
-	Logging::info("Some info message", CLIENT_LOGGER);
-	Logging::warn("A WARNING", CLIENT_LOGGER);
-	Logging::error("An ERROR!!", CLIENT_LOGGER);
-	Logging::critical("SYSTEM ERROR", CLIENT_LOGGER);
-
-	/*TransferDetails details = readTransferDetails();
+	TransferDetails details = readTransferDetails();
 	RequestHandler* handler = createRequestHandler(details);
 	Client c(handler, new RSAPrivateWrapper(), new AESPublicWrapper());
 
@@ -58,20 +51,20 @@ int main()
 	{
 		if (!c.registerClient(details.clientName))
 		{
-			cout << "Server responded with an error" << endl;
+			Logging::error("Server responded with an error", CLIENT_LOGGER);
 			return -1;
 		}
 	}
 
 	if (!c.sendPublicKey())
 	{
-		cout << "Server responded with an error" << endl;
+		Logging::error("Server responded with an error", CLIENT_LOGGER);
 	}
 
 	if (!c.sendFile(details.fileName))
 	{
-		cout << "Server responded with an error" << endl;
-	}*/
+		Logging::error("Server responded with an error", CLIENT_LOGGER);
+	}
 
 	return 0;
 }
@@ -79,8 +72,8 @@ int main()
 void initializeLogging()
 {
 	Logging::initialize();
-	Logging::addLogger(CLIENT_LOGGER, "client.log", LogLevel::Info);
-	Logging::addLogger(CLIENT_LOGGER, "", LogLevel::Debug);
+	Logging::addLogger(CLIENT_LOGGER, LOG_FILE, LogLevel::Debug);
+	Logging::addLogger(CLIENT_LOGGER, LogLevel::Debug);
 }
 
 RequestHandler* createRequestHandler(TransferDetails details)
@@ -96,7 +89,7 @@ RequestHandler* createRequestHandler(TransferDetails details)
 	});
 	ResponseDeserializer* deserializer = new ResponseDeserializerResolver(map<Status, ResponseDeserializer*>
 	{
-		{Status::RegisterSuccess, new RegisterSuccDeserializer()},
+		{ Status::RegisterSuccess, new RegisterSuccDeserializer() },
 		{ Status::RegisterFailure, new HeadersDeserializer() },
 		{ Status::RecievedPublicKey, new AesKeyDeserializer() },
 		{ Status::RecievedFileCRC, new SendFileDeserializer() },
@@ -113,7 +106,8 @@ struct TransferDetails readTransferDetails()
 
 	if (!f.is_open())
 	{
-		cout << "File " << TRANSFER_FILE_NAME << " does not exists!" << endl;
+		string message = string("File ") + TRANSFER_FILE_NAME + " does not exists!";
+		Logging::error(message, CLIENT_LOGGER);
 		return tranDet;
 	}
 	

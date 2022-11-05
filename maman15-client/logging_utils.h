@@ -36,7 +36,8 @@ public:
 	static void initialize();
 	static void uninitialize();
 
-	static void addLogger(const string& loggername = ROOT_LOGGER, const string& filename = "", LogLevel loglevel = LogLevel::Error);
+	static void addLogger(const string& loggername, const string& filename, LogLevel loglevel = LogLevel::Error);
+	static void addLogger(const string& loggername, LogLevel loglevel = LogLevel::Error);
 
 	static void log(const string& message, LogLevel level, const string& loggername = "ROOT_LOGGER");
 	static void debug(const string& message, const string& loggername = "ROOT_LOGGER");

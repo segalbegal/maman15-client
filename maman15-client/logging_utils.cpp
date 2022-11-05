@@ -42,14 +42,15 @@ void Logging::addLogger(const string& loggername, const string& filename, LogLev
 {
 	LoggerInfo info;
 	info.level = loglevel;
-	if (filename.length() == 0)
-	{
-		info.output = &std::cout;
-	}
-	else
-	{
-		info.output = new std::ofstream(filename, std::ios::app);
-	}
+	info.output = new std::ofstream(filename, std::ios::app);
+	Logging::mLoggers[loggername].push_back(info);
+}
+
+void Logging::addLogger(const string& loggername, LogLevel loglevel)
+{
+	LoggerInfo info;
+	info.level = loglevel;
+	info.output = &std::cout;
 	Logging::mLoggers[loggername].push_back(info);
 }
 
